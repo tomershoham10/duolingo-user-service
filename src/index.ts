@@ -3,7 +3,7 @@ import startServer from "./server.js";
 
 (async () => {
   try {
-    await mongoose.connect("mongodb://localhost:27017/Users");
+    await mongoose.connect("mongodb://mongo:27017/Users");
     console.log("connected");
     startServer();
   } catch (e) {

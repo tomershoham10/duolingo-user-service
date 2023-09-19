@@ -3,6 +3,8 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import router from "./router.js";
 import config from "./utils/config.js";
+
+import { errorHandler } from "./middleware/errorHandler.js";
 import { Express } from "express-serve-static-core";
 
 const startServer = () => {
@@ -21,6 +23,7 @@ const configureMiddlewares = (app: Express) => {
   app.use(bodyParser.json());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  app.use(errorHandler);
 };
 
 export default startServer;

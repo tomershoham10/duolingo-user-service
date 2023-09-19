@@ -14,7 +14,7 @@ export interface UserType {
 }
 
 const userSchema: Schema = new Schema({
-  userName: { type: String, required: true },
+  userName: { type: String, unique: true, required: true },
   permission: { type: String, enum: Object.values(Permission), required: true },
   password: { type: String, required: true },
 });

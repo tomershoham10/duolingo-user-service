@@ -20,7 +20,7 @@ export default class UserManager {
       permission,
       password: hashedPassword,
     };
-    const createdNewUser = await UserRepository.createUser(newUser);
+    const createdNewUser = await UserRepository.registerUser(newUser);
     return createdNewUser;
   }
 
@@ -35,12 +35,6 @@ export default class UserManager {
 
   static async findAllUsers(): Promise<UserType[]> {
     return UserRepository.findAllUsers();
-  }
-
-  static async findUserByPermission(
-    permission: Permission
-  ): Promise<UserType[]> {
-    return UserRepository.findUserByPermission(permission);
   }
 
   static async updateUser(
@@ -61,14 +55,18 @@ export default class UserManager {
     return result;
   }
 
-  static async validateUserCredentials(
+  static async login(
     userName: string,
     password: string
-  ): Promise<UserType | null> {
-    const result = await UserRepository.validateUserCredentials(
-      userName,
-      password
-    );
-    return result;
+  ): Promise<string | undefined | null> {
+    try {
+      const accessToken = await UserRepository.validateUserCredentials(
+        userName,
+        password
+      );
+      return accessToken;
+    } catch (err) {
+      console.log(err);
+    }
   }
 }

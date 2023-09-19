@@ -1,12 +1,14 @@
 import Express from "express";
-import { Permission, UserType } from "./model.js";
+import { UserType } from "./model.js";
 import UserManager from "./manager.js";
+import { NotFoundError } from "../exceptions/notFoundError.js";
 
 export class UserController {
-  static async create(req: Express.Request, res: Express.Response) {
+  static async registerUser(req: Express.Request, res: Express.Response) {
     try {
       const body: UserType = req.body;
-      console.log(body);
+      // console.log("UserController create", req.method);
+
       const userName = body.userName;
       const permission = body.permission;
       const password = body.password;
@@ -21,10 +23,10 @@ export class UserController {
     }
   }
 
-  static async getMany(_req: Express.Request, res: Express.Response) {
+  static async getMany(req: Express.Request, res: Express.Response) {
     try {
+      console.log("getMany", req.userName);
       const users: UserType[] = await UserManager.findAllUsers();
-      console.log("getMany");
       res.status(200).json(users);
     } catch (err) {
       console.error(err);
@@ -36,41 +38,18 @@ export class UserController {
     try {
       // console.log("get");
       const id: string | undefined = req.query.id as string | undefined;
-      console.log("req", id);
       if (id === undefined) {
-        console.log("not found");
+        new NotFoundError("ID is undefined");
       } else {
         const user: UserType | null = await UserManager.findUserById(id);
-        console.log("user", user);
-        !user ? console.log("not found") : res.json(user);
+        !user
+          ? new NotFoundError(`User with ID ${req.query.id} not found.`)
+          : res.status(200).json(user);
       }
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  static async getByPermission(req: Express.Request, res: Express.Response) {
-    try {
-      const rawPermission: unknown = req.query.userName;
-      console.log(rawPermission);
-      if (typeof rawPermission !== "string") {
-        // Handle the case when userName is not a valid string
-        console.log("Invalid userName");
-        return;
-      }
-
-      const permission: Permission = rawPermission as Permission;
-      const users: UserType[] | null = await UserManager.findUserByPermission(
-        permission
-      );
-
-      if (!users) {
-        console.log("Users not found");
-      } else {
-        res.json(users);
-      }
-    } catch (err) {
-      console.log(err);
+    } catch (e) {
+      res
+        .status(500)
+        .json({ error: `Error getting the user with ID: ${req.query.id}.` });
     }
   }
 
@@ -81,7 +60,7 @@ export class UserController {
       const user = await UserManager.updateUser(id, body);
       res.json(user);
     } catch (err) {
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: "Error while updating the user." });
     }
   }
 
@@ -91,22 +70,19 @@ export class UserController {
       const status = await UserManager.deleteUser(id);
       res.json(status);
     } catch (err) {
-      console.log(err);
+      res.status(500).json({ error: "Error while deleting the user." });
     }
   }
 
-  static async validateUser(req: Express.Request, res: Express.Response) {
+  static async login(req: Express.Request, res: Express.Response) {
     try {
-      console.log(req.body);
       const userName: string = req.body.userName;
       const password: string = req.body.password;
-      const user = await UserManager.validateUserCredentials(
-        userName,
-        password
-      );
-      res.json(user);
+      console.log("controller login", { userName, password });
+      const accessToken = await UserManager.login(userName, password);
+      res.json({ accessToken: accessToken });
     } catch (err) {
-      console.log(err);
+      res.status(500).json({ error: "Internal Server Error" });
     }
   }
 }
