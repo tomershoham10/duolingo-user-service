@@ -55,18 +55,16 @@ export default class UserManager {
     return result;
   }
 
-  static async login(
-    userName: string,
-    password: string
-  ): Promise<string | undefined | null> {
+  static async login(userName: string, password: string): Promise<boolean> {
     try {
-      const accessToken = await UserRepository.validateUserCredentials(
+      const registred = await UserRepository.validateUserCredentials(
         userName,
         password
       );
-      return accessToken;
+      return registred;
     } catch (err) {
-      console.log(err);
+      console.error("Error while signing in:", err);
+      return false;
     }
   }
 }

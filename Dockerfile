@@ -23,6 +23,6 @@ RUN npm ci --only=production
 
 COPY --from=development /usr/src/app/dist ./dist
 
-EXPOSE 4000
+EXPOSE 4001
 
 CMD ["node","dist/index.js"]

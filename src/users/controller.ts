@@ -1,4 +1,6 @@
 import Express from "express";
+import axios from "axios";
+
 import { UserType } from "./model.js";
 import UserManager from "./manager.js";
 import { NotFoundError } from "../exceptions/notFoundError.js";
@@ -78,11 +80,41 @@ export class UserController {
     try {
       const userName: string = req.body.userName;
       const password: string = req.body.password;
-      console.log("controller login", { userName, password });
-      const accessToken = await UserManager.login(userName, password);
-      res.json({ accessToken: accessToken });
-    } catch (err) {
-      res.status(500).json({ error: "Internal Server Error" });
+      console.log("user-controller login username", { userName, password });
+      const registred = await UserManager.login(userName, password);
+      console.log("user-controller response from user-service", registred);
+
+      if (registred) {
+        const responseToken = await axios.post(
+          "http://authentication-service:4000/api/auth/tokens-generate",
+          {
+            userName: userName,
+          }
+        );
+        const token = responseToken.data.token;
+        console.log("user-controller response from auth-service", token);
+        res.header("Authorization", `Bearer ${token}`);
+
+        res.status(200).json({ message: "Authentication successful" });
+      } else {
+        res
+          .status(401)
+          .json({
+            message: "Authentication failed. Invalid username or password.",
+          });
+      }
+    } catch (error) {
+      if (error && typeof error === "object" && "code" in error) {
+        if (error.code === "ECONNREFUSED") {
+          console.error(
+            "Connection to the server was refused. Please check if the server is running."
+          );
+        } else {
+          console.error("An error occurred:", error);
+        }
+      } else {
+        console.error("An unknown error occurred:", error);
+      }
     }
   }
 }

@@ -37,35 +37,22 @@ export default class UserRepository {
   static async validateUserCredentials(
     userName: string,
     password: string
-  ): Promise<string | undefined | null> {
+  ): Promise<boolean> {
     try {
       const user = await User.findOne({ userName: userName });
       if (!user) {
-        throw new Error("User not found!");
+        return false;
       }
 
       const passwordMatch = await bcrypt.compare(password, user.password);
-      if (!passwordMatch) {
-        return null;
-      }
-
-      // console.log("repo accessToken", passwordMatch);
-
-      let accessToken = null;
       if (passwordMatch) {
-        // console.log(
-        //   "process.env.ACCESS_TOKEN_SECRET",
-        //   process.env.ACCESS_TOKEN_SECRET
-        // );
-        accessToken = jwt.sign(
-          { userName: user.userName },
-          process.env.ACCESS_TOKEN_SECRET as string
-        );
-        // console.log("repo accessToken", accessToken);
+        return true;
+      } else {
+        return false;
       }
-      return accessToken;
     } catch (err) {
-      console.error("Error while signing JWT:", err);
+      console.error("Error while signing in:", err);
+      return false;
     }
   }
 

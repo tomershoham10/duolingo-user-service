@@ -12,8 +12,6 @@ function authenticateToken(req: Request, res: Response, next: NextFunction) {
 
   jwt.verify(token, secretKey, (err, user: any) => {
     if (err) return res.sendStatus(403);
-    // console.log("authenticateToken user", user, req.userName);
-
     req.userName = user.userName;
     next();
   });
