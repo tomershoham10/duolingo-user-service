@@ -1,7 +1,6 @@
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import User, { UserType } from "./model.js";
+import User from "./model.js";
 
 dotenv.config();
 
@@ -83,6 +82,19 @@ export default class UserRepository {
       }
     } catch (error) {
       throw new Error("Error updating password");
+    }
+  }
+
+  static async roleCheck(userName: string): Promise<Permission | undefined> {
+    try {
+
+      const user = await User.findOne({ userName: userName });
+      const role = user?.permission as Permission;
+      return role
+
+    }
+    catch (err) {
+      console.error(err);
     }
   }
 }

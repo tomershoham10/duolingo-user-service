@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import User, { UserType, Permission } from "./model.js";
+import User from "./model.js";
 import UserRepository from "./repository.js";
 
 export default class UserManager {
@@ -65,6 +65,16 @@ export default class UserManager {
     } catch (err) {
       console.error("Error while signing in:", err);
       return false;
+    }
+  }
+
+  static async roleCheck(userName: string): Promise<Permission | undefined> {
+    try {
+      const role = await UserRepository.roleCheck(userName);
+      return role;
+    }
+    catch (err) {
+      console.error(err);
     }
   }
 }

@@ -1,7 +1,6 @@
 import Express from "express";
 import axios from "axios";
 
-import { UserType } from "./model.js";
 import UserManager from "./manager.js";
 import { NotFoundError } from "../exceptions/notFoundError.js";
 
@@ -85,10 +84,13 @@ export class UserController {
       console.log("user-controller response from user-service", registred);
 
       if (registred) {
+        const role = await UserManager.roleCheck(userName);
+
         const responseToken = await axios.post(
           "http://authentication-service:4000/api/auth/tokens-generate",
           {
             userName: userName,
+            role: role
           }
         );
         const token = responseToken.data.token;

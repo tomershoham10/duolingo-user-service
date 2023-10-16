@@ -1,16 +1,10 @@
 import mongoose, { Schema } from "mongoose";
 
-export enum Permission {
+enum Permission {
   ADMIN = "admin",
   SENIOR = "senior", //S.R.
   MEDIUM = "medium", //bachir
   CREW = "crew",
-}
-
-export interface UserType {
-  userName: string;
-  permission: Permission;
-  password: string;
 }
 
 const userSchema: Schema = new Schema({
