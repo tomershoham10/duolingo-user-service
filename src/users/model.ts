@@ -8,6 +8,7 @@ enum Permission {
 }
 
 const userSchema: Schema = new Schema({
+  id: { type: String },
   userName: { type: String, unique: true, required: true },
   permission: { type: String, enum: Object.values(Permission), required: true },
   password: { type: String, required: true },

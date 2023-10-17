@@ -15,7 +15,7 @@ export default class UserManager {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser: UserType = {
+    const newUser: Partial<UserType> = {
       userName,
       permission,
       password: hashedPassword,

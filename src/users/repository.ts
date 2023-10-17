@@ -5,7 +5,7 @@ import User from "./model.js";
 dotenv.config();
 
 export default class UserRepository {
-  static async registerUser(user: UserType): Promise<UserType> {
+  static async registerUser(user: Partial<UserType>): Promise<UserType> {
     return User.create(user);
   }
 
