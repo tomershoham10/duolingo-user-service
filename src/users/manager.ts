@@ -33,6 +33,15 @@ export default class UserManager {
     }
   }
 
+  static async getUserByPermission(permission: Permission): Promise<UserType[] | null> {
+    try {
+      const users = await UserRepository.getUserByPermission(permission);
+      return users || null;
+    } catch {
+      throw new Error("server error (getUserByPermission).");
+    }
+  }
+
   static async findAllUsers(): Promise<UserType[]> {
     return UserRepository.findAllUsers();
   }

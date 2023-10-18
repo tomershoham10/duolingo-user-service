@@ -11,6 +11,8 @@ userRouter.get("/", asyncHandler(UserController.getMany));
 
 userRouter.get("/:id", authMiddleware, asyncHandler(UserController.getById));
 
+userRouter.get("/permission", authMiddleware, asyncHandler(UserController.getByPermission));
+
 userRouter.post(
   "/",
   authMiddleware,

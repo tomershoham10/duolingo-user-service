@@ -37,7 +37,6 @@ export class UserController {
 
   static async getById(req: Express.Request, res: Express.Response) {
     try {
-      // console.log("get");
       const id: string | undefined = req.query.id as string | undefined;
       if (id === undefined) {
         new NotFoundError("ID is undefined");
@@ -51,6 +50,24 @@ export class UserController {
       res
         .status(500)
         .json({ error: `Error getting the user with ID: ${req.query.id}.` });
+    }
+  }
+
+  static async getByPermission(req: Express.Request, res: Express.Response) {
+    try {
+      const permission: Permission | undefined = req.body.permission as Permission | undefined;
+      if (permission === undefined) {
+        new NotFoundError("permission is undefined");
+      } else {
+        const users: UserType[] | null = await UserManager.getUserByPermission(permission);
+        users ? res.status(200).json(users)
+          : new NotFoundError(`getByPermission not found.`)
+
+      }
+    } catch (e) {
+      res
+        .status(500)
+        .json({ error: "server error" });
     }
   }
 

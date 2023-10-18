@@ -97,4 +97,14 @@ export default class UserRepository {
       console.error(err);
     }
   }
+
+  static async getUserByPermission(permission: Permission): Promise<UserType[] | undefined> {
+    try {
+      const users = await User.find({ permission: permission });
+      return users
+    }
+    catch (err) {
+      console.error(err);
+    }
+  }
 }
