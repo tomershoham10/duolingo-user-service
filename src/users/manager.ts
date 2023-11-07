@@ -5,23 +5,30 @@ import UserRepository from "./repository.js";
 export default class UserManager {
   static async registerUser(
     userName: string,
-    permission: Permission,
-    password: string
+    tId: string | null,
+    password: string,
+    permission: Permission
   ) {
-    const existingUser = await User.findOne({ userName });
-    if (existingUser) {
-      throw new Error("User already existed!");
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      let newUser: Partial<UserType>
+      tId ?
+        newUser = {
+          userName,
+          tId: tId,
+          password: hashedPassword,
+          permission,
+        } : newUser = {
+          userName,
+          password: hashedPassword,
+          permission,
+        }
+
+      const createdNewUser = await UserRepository.registerUser(newUser);
+      return createdNewUser;
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser: Partial<UserType> = {
-      userName,
-      permission,
-      password: hashedPassword,
-    };
-    const createdNewUser = await UserRepository.registerUser(newUser);
-    return createdNewUser;
+    catch (err) { console.log("manager register", err); }
   }
 
   static async findUserById(userId: string): Promise<UserType | null> {
@@ -55,7 +62,7 @@ export default class UserManager {
 
       return updatedUser;
     } catch {
-      throw new Error("Error finding user by username.");
+      throw new Error("User already existed");
     }
   }
 

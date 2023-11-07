@@ -1,6 +1,7 @@
 import Express from "express";
 import axios from "axios";
 
+import User from "./model.js";
 import UserManager from "./manager.js";
 import { NotFoundError } from "../exceptions/notFoundError.js";
 
@@ -8,26 +9,39 @@ export class UserController {
   static async registerUser(req: Express.Request, res: Express.Response) {
     try {
       const body: UserType = req.body;
-      // console.log("UserController create", req.method);
+      console.log("UserController create", body);
 
       const userName = body.userName;
+      let tId: string | null = null;
+      if (body.tId) {
+        tId = body.tId;
+      }
       const permission = body.permission;
       const password = body.password;
-      const user: UserType = await UserManager.registerUser(
-        userName,
-        permission,
-        password
-      );
-      res.json(user);
+
+      const existingUser = await User.findOne({ userName });
+      if (existingUser) {
+        return res.status(409).json({ error: "User already existed!" });
+      } else {
+        const user: UserType | undefined = await UserManager.registerUser(
+          userName,
+          tId,
+          password,
+          permission
+        );
+        return res.json(user);
+      }
     } catch (err) {
       console.log(err);
+      return res.status(500).json({ error: "Internal Server Error" });
     }
   }
 
   static async getMany(req: Express.Request, res: Express.Response) {
     try {
-      console.log("getMany", req.userName);
       const users: UserType[] = await UserManager.findAllUsers();
+      console.log("getMany", users);
+
       res.status(200).json(users);
     } catch (err) {
       console.error(err);
@@ -37,28 +51,34 @@ export class UserController {
 
   static async getById(req: Express.Request, res: Express.Response) {
     try {
-      const id: string | undefined = req.query.id as string | undefined;
+      const id: string = req.params.id;
+      console.log("getbyid controller id", id);
       if (id === undefined) {
         new NotFoundError("ID is undefined");
       } else {
         const user: UserType | null = await UserManager.findUserById(id);
         !user
-          ? new NotFoundError(`User with ID ${req.query.id} not found.`)
+          ? new NotFoundError(`User with ID ${req.params.id} not found.`)
           : res.status(200).json(user);
       }
     } catch (e) {
       res
         .status(500)
-        .json({ error: `Error getting the user with ID: ${req.query.id}.` });
+        .json({ error: `Error getting the user with ID: ${req.params.id}.` });
     }
   }
 
   static async getByPermission(req: Express.Request, res: Express.Response) {
     try {
-      const permission: Permission | undefined = req.body.permission as Permission | undefined;
+      console.log("check1");
+      // console.log("controller getByPermission req.params", req.params, req.params.permission);
+      const permission: Permission | undefined = req.params.permission as Permission | undefined;
       if (permission === undefined) {
+        console.log("check2");
+
         new NotFoundError("permission is undefined");
       } else {
+        console.log("controller getByPermission", permission);
         const users: UserType[] | null = await UserManager.getUserByPermission(permission);
         users ? res.status(200).json(users)
           : new NotFoundError(`getByPermission not found.`)
@@ -75,6 +95,8 @@ export class UserController {
     try {
       const id: string = req.params.id;
       const body: Partial<UserType> = req.body;
+      console.log("controller - update user, req.params", req.params);
+
       const user = await UserManager.updateUser(id, body);
       res.json(user);
     } catch (err) {

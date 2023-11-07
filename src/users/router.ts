@@ -5,22 +5,17 @@ import { asyncHandler } from "../middleware/asyncHandler.js";
 
 const userRouter = express.Router();
 
-userRouter.post("/", asyncHandler(UserController.registerUser));
 
-userRouter.get("/", asyncHandler(UserController.getMany));
+// userRouter.get("/:id", authMiddleware, asyncHandler(UserController.getById));
+userRouter
+  .get("/permission/:permission", asyncHandler(UserController.getByPermission))
+  .get("/:id", asyncHandler(UserController.getById))
+  .get("/", asyncHandler(UserController.getMany));
 
-userRouter.get("/:id", authMiddleware, asyncHandler(UserController.getById));
-
-userRouter.get("/permission", authMiddleware, asyncHandler(UserController.getByPermission));
-
-userRouter.post(
-  "/",
-  authMiddleware,
-  authMiddleware,
-  asyncHandler(UserController.registerUser)
-);
-
-userRouter.post("/login", asyncHandler(UserController.login));
+userRouter
+  .post("/login", asyncHandler(UserController.login))
+  .post("/", asyncHandler(UserController.registerUser)
+  );
 
 userRouter.put("/:id", authMiddleware, asyncHandler(UserController.updateById));
 

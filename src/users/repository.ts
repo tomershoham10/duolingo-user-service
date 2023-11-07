@@ -1,36 +1,72 @@
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
-import User from "./model.js";
+import UsersModel from "./model.js";
 
 dotenv.config();
 
 export default class UserRepository {
   static async registerUser(user: Partial<UserType>): Promise<UserType> {
-    return User.create(user);
+    try {
+      const newUser = await UsersModel.create(user);
+      return newUser
+    }
+    catch (error) {
+      throw new Error(`User repo create: ${error}`);
+    }
   }
 
   static async findUserById(userId: string): Promise<UserType | null> {
-    return User.findById(userId);
+    try {
+      const user = await UsersModel.findById(userId);
+      return user;
+    }
+    catch (error) {
+      throw new Error(`User repo findUserById: ${error}`);
+    }
   }
 
   static async findUserByName(userName: string): Promise<UserType | null> {
-    return User.findOne({ userName: userName });
+    try {
+      const user = await UsersModel.findOne({ userName: userName });
+      return user;
+    }
+    catch (error) {
+      throw new Error(`User repo findUserByName: ${error}`);
+    }
   }
 
   static async updateUser(
     userId: string,
     updateFields: Partial<UserType>
   ): Promise<UserType | null> {
-    return User.findByIdAndUpdate(userId, updateFields, { new: true });
+    try {
+      console.log("repo - update user", userId, updateFields);
+      const updatedUser = await UsersModel.findByIdAndUpdate(userId, updateFields, { new: true });
+      return updatedUser;
+    }
+    catch (error) {
+      throw new Error(`User repo updateUser: ${error}`);
+    }
   }
 
   static async deleteUser(useId: string): Promise<boolean> {
-    const result = await User.findByIdAndDelete(useId);
-    return !!result;
+    try {
+      const result = await UsersModel.findByIdAndDelete(useId);
+      return !!result;
+    }
+    catch (error) {
+      throw new Error(`User repo updateUser: ${error}`);
+    }
   }
 
   static async findAllUsers(): Promise<UserType[]> {
-    return User.find();
+    try {
+      const users = await UsersModel.find();
+      return users;
+    }
+    catch (error) {
+      throw new Error(`User repo updateUser: ${error}`);
+    }
   }
 
   static async validateUserCredentials(
@@ -38,7 +74,7 @@ export default class UserRepository {
     password: string
   ): Promise<boolean> {
     try {
-      const user = await User.findOne({ userName: userName });
+      const user = await UsersModel.findOne({ userName: userName });
       if (!user) {
         return false;
       }
@@ -68,7 +104,7 @@ export default class UserRepository {
       if (checkOldPassword) {
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-        const result = await User.findByIdAndUpdate(userId, {
+        const result = await UsersModel.findByIdAndUpdate(userId, {
           password: hashedPassword,
         });
 
@@ -88,7 +124,7 @@ export default class UserRepository {
   static async roleCheck(userName: string): Promise<Permission | undefined> {
     try {
 
-      const user = await User.findOne({ userName: userName });
+      const user = await UsersModel.findOne({ userName: userName });
       const role = user?.permission as Permission;
       return role
 
@@ -100,7 +136,10 @@ export default class UserRepository {
 
   static async getUserByPermission(permission: Permission): Promise<UserType[] | undefined> {
     try {
-      const users = await User.find({ permission: permission });
+      console.log("repo getByPermission permission", permission);
+
+      const users = await UsersModel.find({ permission: permission });
+      console.log("repo getByPermission users", users);
       return users
     }
     catch (err) {
