@@ -72,7 +72,7 @@ export default class UserRepository {
   static async validateUserCredentials(
     userName: string,
     password: string
-  ): Promise<boolean> {
+  ): Promise<string | boolean> {
     try {
       const user = await UsersModel.findOne({ userName: userName });
       if (!user) {
@@ -81,7 +81,7 @@ export default class UserRepository {
 
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (passwordMatch) {
-        return true;
+        return user._id.toString();
       } else {
         return false;
       }

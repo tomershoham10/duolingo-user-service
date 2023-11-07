@@ -71,13 +71,13 @@ export default class UserManager {
     return result;
   }
 
-  static async login(userName: string, password: string): Promise<boolean> {
+  static async login(userName: string, password: string): Promise<string | boolean> {
     try {
-      const registred = await UserRepository.validateUserCredentials(
+      const registredId = await UserRepository.validateUserCredentials(
         userName,
         password
       );
-      return registred;
+      return registredId;
     } catch (err) {
       console.error("Error while signing in:", err);
       return false;

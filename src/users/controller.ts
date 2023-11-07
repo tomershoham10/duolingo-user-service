@@ -119,16 +119,18 @@ export class UserController {
       const userName: string = req.body.userName;
       const password: string = req.body.password;
       console.log("user-controller login username", { userName, password });
-      const registred = await UserManager.login(userName, password);
-      console.log("user-controller response from user-service", registred);
+      const registredId = await UserManager.login(userName, password);
+      const userId = registredId;
+      console.log("user-controller response from user-service", registredId);
 
-      if (registred) {
+      if (registredId) {
         const role = await UserManager.roleCheck(userName);
 
         const responseToken = await axios.post(
           "http://authentication-service:4000/api/auth/tokens-generate",
           {
             userName: userName,
+            userId: userId,
             role: role
           }
         );
