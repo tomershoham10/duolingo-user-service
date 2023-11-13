@@ -68,6 +68,26 @@ export class UserController {
     }
   }
 
+  static async getNextLevelById(req: Express.Request, res: Express.Response) {
+    try {
+      const userId: string = req.params.id;
+      console.log("getNextLevelById controller id", userId);
+      if (userId === undefined) {
+        new NotFoundError("userId is undefined");
+      } else {
+        const nextLevelId: string | null = await UserManager.getNextLevelById(userId);
+        !nextLevelId
+          ? res.status(400).json("level not found.")
+          : res.status(200).json(nextLevelId);
+      }
+    } catch (e) {
+      console.error(e);
+      res
+        .status(500)
+        .json({ error: `Error getting the next level with ID: ${req.params.id}.` });
+    }
+  }
+
   static async getByPermission(req: Express.Request, res: Express.Response) {
     try {
       console.log("check1");

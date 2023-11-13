@@ -9,6 +9,7 @@ const userRouter = express.Router();
 // userRouter.get("/:id", authMiddleware, asyncHandler(UserController.getById));
 userRouter
   .get("/permission/:permission", asyncHandler(UserController.getByPermission))
+  .get("/nextLevel/:id", asyncHandler(UserController.getNextLevelById))
   .get("/:id", asyncHandler(UserController.getById))
   .get("/", asyncHandler(UserController.getMany));
 

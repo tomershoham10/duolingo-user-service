@@ -40,6 +40,18 @@ export default class UserManager {
     }
   }
 
+  static async getNextLevelById(userId: string): Promise<string | null> {
+    try {
+      const nextLessonId = await UserRepository.getNextLevelById(userId);
+      console.log("manager getNextLevelById - ", nextLessonId);
+      return nextLessonId || null;
+    } catch (error) {
+      console.error(error);
+      throw new Error(`Error finding user by Id. ${error}`);
+    }
+  }
+
+
   static async getUserByPermission(permission: Permission): Promise<UserType[] | null> {
     try {
       const users = await UserRepository.getUserByPermission(permission);
