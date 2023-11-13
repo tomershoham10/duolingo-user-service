@@ -12,4 +12,5 @@ interface UserType {
     userName: string;
     permission: Permission;
     password: string;
+    nextLessonId: string;
 }
