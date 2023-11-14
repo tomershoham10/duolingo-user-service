@@ -2,6 +2,7 @@ import express from "express";
 import { UserController } from "./controller.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import { asyncHandler } from "../middleware/asyncHandler.js";
+import getFirstLessonFromCourse from "../middleware/getFirstLessonFromCourse.js";
 
 const userRouter = express.Router();
 
@@ -15,7 +16,7 @@ userRouter
 
 userRouter
   .post("/login", asyncHandler(UserController.login))
-  .post("/", asyncHandler(UserController.registerUser)
+  .post("/",asyncHandler(getFirstLessonFromCourse), asyncHandler(UserController.registerUser)
   );
 
 userRouter.put("/:id", authMiddleware, asyncHandler(UserController.updateById));

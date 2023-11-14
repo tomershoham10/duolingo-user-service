@@ -83,16 +83,16 @@ export default class UserManager {
     return result;
   }
 
-  static async login(userName: string, password: string): Promise<string | boolean> {
+  static async login(userName: string, password: string): Promise<UserType | null> {
     try {
-      const registredId = await UserRepository.validateUserCredentials(
+      const user = await UserRepository.validateUserCredentials(
         userName,
         password
       );
-      return registredId;
+      return user;
     } catch (err) {
       console.error("Error while signing in:", err);
-      return false;
+      throw new Error(`error in user manager login - ${err}`);
     }
   }
 

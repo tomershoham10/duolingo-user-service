@@ -86,22 +86,22 @@ export default class UserRepository {
   static async validateUserCredentials(
     userName: string,
     password: string
-  ): Promise<string | boolean> {
+  ): Promise<UserType | null> {
     try {
       const user = await UsersModel.findOne({ userName: userName });
       if (!user) {
-        return false;
+        return null;
       }
 
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (passwordMatch) {
-        return user._id.toString();
+        return user;
       } else {
-        return false;
+        return null;
       }
     } catch (err) {
       console.error("Error while signing in:", err);
-      return false;
+      return null;
     }
   }
 

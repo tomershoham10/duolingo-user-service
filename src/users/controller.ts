@@ -139,32 +139,35 @@ export class UserController {
       const userName: string = req.body.userName;
       const password: string = req.body.password;
       console.log("user-controller login username", { userName, password });
-      const registredId = await UserManager.login(userName, password);
-      const userId = registredId;
-      console.log("user-controller response from user-service", registredId);
+      const user = await UserManager.login(userName, password);
+      if (user) {
+        const userId = user.id;
+        console.log("user-controller response from user-service", userId);
 
-      if (registredId) {
-        const role = await UserManager.roleCheck(userName);
+        if (userId) {
+          const role = await UserManager.roleCheck(user.userName);
 
-        const responseToken = await axios.post(
-          "http://authentication-service:4000/api/auth/tokens-generate",
-          {
-            userName: userName,
-            userId: userId,
-            role: role
-          }
-        );
-        const token = responseToken.data.token;
-        console.log("user-controller response from auth-service", token);
-        res.header("Authorization", `Bearer ${token}`);
+          const responseToken = await axios.post(
+            "http://authentication-service:4000/api/auth/tokens-generate",
+            {
+              userName: user.userName,
+              userId: user.id,
+              nextLessonId: user.nextLessonId,
+              role: role
+            }
+          );
+          const token = responseToken.data.token;
+          console.log("user-controller response from auth-service", token);
+          res.header("Authorization", `Bearer ${token}`);
 
-        res.status(200).json({ message: "Authentication successful" });
-      } else {
-        res
-          .status(401)
-          .json({
-            message: "Authentication failed. Invalid username or password.",
-          });
+          res.status(200).json({ message: "Authentication successful" });
+        } else {
+          res
+            .status(401)
+            .json({
+              message: "Authentication failed. Invalid username or password.",
+            });
+        }
       }
     } catch (error) {
       if (error && typeof error === "object" && "code" in error) {
