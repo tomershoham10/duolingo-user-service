@@ -7,7 +7,7 @@ enum Permission {
 }
 
 interface UserType {
-    id: string;
+    _id: string;
     tId?: string;
     userName: string;
     permission: Permission;

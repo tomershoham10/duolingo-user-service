@@ -49,33 +49,37 @@ export class UserController {
     }
   }
 
-  static async getById(req: Express.Request, res: Express.Response) {
+  static async getById(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
     try {
       const id: string = req.params.id;
       console.log("getbyid controller id", id);
-      if (id === undefined) {
-        new NotFoundError("ID is undefined");
+      if (!id) {
+        throw new NotFoundError("ID is undefined");
       } else {
         const user: UserType | null = await UserManager.findUserById(id);
-        !user
-          ? new NotFoundError(`User with ID ${req.params.id} not found.`)
-          : res.status(200).json(user);
+        console.log("getById controller - user", user);
+        if (!user) {
+          throw new NotFoundError(`User with ID ${req.params.id} not found.`);
+        }
+        res.status(200).json(user);
+        next();
       }
     } catch (e) {
+      console.error(e);
       res
         .status(500)
         .json({ error: `Error getting the user with ID: ${req.params.id}.` });
     }
   }
 
-  static async getNextLevelById(req: Express.Request, res: Express.Response) {
+  static async getNextLessonById(req: Express.Request, res: Express.Response) {
     try {
       const userId: string = req.params.id;
       console.log("getNextLevelById controller id", userId);
       if (userId === undefined) {
         new NotFoundError("userId is undefined");
       } else {
-        const nextLevelId: string | null = await UserManager.getNextLevelById(userId);
+        const nextLevelId: string | null = await UserManager.getNextLessonById(userId);
         !nextLevelId
           ? res.status(400).json("level not found.")
           : res.status(200).json(nextLevelId);
@@ -124,6 +128,18 @@ export class UserController {
     }
   }
 
+  static async updateNextLessonId(req: Express.Request, res: Express.Response) {
+    try {
+      const userId: string = req.params.userId;
+      console.log("controller - updateNextLessonId", userId);
+
+      const nextLessonId = await UserManager.updateNextLessonId(userId);
+      res.json(nextLessonId);
+    } catch (err) {
+      res.status(500).json({ error: "Error while updateNextLessonId." });
+    }
+  }
+
   static async deleteById(req: Express.Request, res: Express.Response) {
     try {
       const id: string = req.params.id;
@@ -141,7 +157,7 @@ export class UserController {
       console.log("user-controller login username", { userName, password });
       const user = await UserManager.login(userName, password);
       if (user) {
-        const userId = user.id;
+        const userId = user._id;
         console.log("user-controller response from user-service", userId);
 
         if (userId) {
@@ -151,7 +167,7 @@ export class UserController {
             "http://authentication-service:4000/api/auth/tokens-generate",
             {
               userName: user.userName,
-              userId: user.id,
+              userId: user._id,
               nextLessonId: user.nextLessonId,
               role: role
             }

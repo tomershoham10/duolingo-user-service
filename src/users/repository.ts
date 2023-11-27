@@ -25,7 +25,7 @@ export default class UserRepository {
     }
   }
 
-  static async getNextLevelById(userId: string): Promise<string | null> {
+  static async getNextLessonById(userId: string): Promise<string | null> {
     try {
       const user = await UsersModel.findById(userId);
       if (user) {

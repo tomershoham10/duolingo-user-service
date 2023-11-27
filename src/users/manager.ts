@@ -1,6 +1,14 @@
 import bcrypt from "bcrypt";
-import User from "./model.js";
 import UserRepository from "./repository.js";
+import getNextLessonId from "../middleware/getNextLessonId.js";
+
+enum Permission {
+  ADMIN = "admin",
+  SEARIDER = "searider", //S.R.
+  SENIOR = "senior", //bachir
+  TEACHER = "teacher",
+  CREW = "crew",
+}
 
 export default class UserManager {
   static async registerUser(
@@ -33,17 +41,19 @@ export default class UserManager {
 
   static async findUserById(userId: string): Promise<UserType | null> {
     try {
+      console.log("manager - findUserById - userId", userId);
       const user = await UserRepository.findUserById(userId);
+      console.log("manager - findUserById - ", user);
       return user || null;
     } catch {
       throw new Error("Error finding user by Id.");
     }
   }
 
-  static async getNextLevelById(userId: string): Promise<string | null> {
+  static async getNextLessonById(userId: string): Promise<string | null> {
     try {
-      const nextLessonId = await UserRepository.getNextLevelById(userId);
-      console.log("manager getNextLevelById - ", nextLessonId);
+      const nextLessonId = await UserRepository.getNextLessonById(userId);
+      console.log("manager getNextLessonById - ", nextLessonId);
       return nextLessonId || null;
     } catch (error) {
       console.error(error);
@@ -73,6 +83,26 @@ export default class UserManager {
       const updatedUser = await UserRepository.updateUser(userId, updateFields);
 
       return updatedUser;
+    } catch {
+      throw new Error("User already existed");
+    }
+  }
+
+  static async updateNextLessonId(
+    userId: string,
+  ): Promise<string | null> {
+    try {
+      console.log("manager - updateNextLessonId", userId);
+      const user = await UserRepository.findUserById(userId);
+      console.log("manager - updateNextLessonId", user);
+      if (user && user.permission !== Permission.ADMIN) {
+        const nextLessonId = await getNextLessonId(user.permission, user.nextLessonId);
+        console.log("manager - updateNextLessonId - nextLessonId", nextLessonId);
+        const updatedUser = await UserRepository.updateUser(user._id, { nextLessonId: nextLessonId });
+        console.log("manager - updateNextLessonId - updatedUser", updatedUser);
+        return null;
+      }
+      return null;
     } catch {
       throw new Error("User already existed");
     }
