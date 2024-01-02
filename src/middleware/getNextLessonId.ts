@@ -1,14 +1,6 @@
 import axios from "axios";
 
-enum Permission {
-    ADMIN = "admin",
-    SEARIDER = "searider", //S.R.
-    SENIOR = "senior", //bachir
-    TEACHER = "teacher",
-    CREW = "crew",
-}
-
-async function getNextLessonId(permission: Permission, pervLessonId?: string) {
+async function getNextLessonId(courseId: string, pervLessonId?: string) {
     if (pervLessonId) {
         const nextLessonResponse = await axios.get(
             `http://classes-service:8080/api/levels/getNextLessonId/${pervLessonId}`,
@@ -17,9 +9,8 @@ async function getNextLessonId(permission: Permission, pervLessonId?: string) {
         console.log("getNextLessonId - nextLessonId", nextLessonId);
         return nextLessonId;
     }
-    if (permission === Permission.ADMIN) return;
     const courseResponse = await axios.get(
-        `http://classes-service:8080/api/courses/getByType/${permission}`,
+        `http://classes-service:8080/api/courses/${courseId}`,
     );
     if (courseResponse.status === 200) {
         const courseUnitsIds = courseResponse.data.course.units;

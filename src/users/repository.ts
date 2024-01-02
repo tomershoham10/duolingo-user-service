@@ -28,9 +28,9 @@ export default class UserRepository {
   static async getNextLessonById(userId: string): Promise<string | null> {
     try {
       const user = await UsersModel.findById(userId);
-      if (user) {
+      if (user && user.permission === PermissionsTypes.STUDENT) {
         const nextLessonId = user.nextLessonId;
-        return nextLessonId;
+        return nextLessonId ? nextLessonId : null;
       }
       else return null;
     }
@@ -135,11 +135,11 @@ export default class UserRepository {
     }
   }
 
-  static async roleCheck(userName: string): Promise<Permission | undefined> {
+  static async roleCheck(userName: string): Promise<PermissionsTypes | undefined> {
     try {
 
       const user = await UsersModel.findOne({ userName: userName });
-      const role = user?.permission as Permission;
+      const role = user?.permission as PermissionsTypes;
       return role
 
     }
@@ -148,12 +148,25 @@ export default class UserRepository {
     }
   }
 
-  static async getUserByPermission(permission: Permission): Promise<UserType[] | undefined> {
+  static async getUsersByPermission(permission: PermissionsTypes): Promise<UserType[] | undefined> {
     try {
       console.log("repo getByPermission permission", permission);
 
       const users = await UsersModel.find({ permission: permission });
       console.log("repo getByPermission users", users);
+      return users
+    }
+    catch (err) {
+      console.error(err);
+    }
+  }
+
+  static async getUsersByCourseId(courseId: string): Promise<UserType[] | undefined> {
+    try {
+      console.log("repo getUsersByCourseId courseId", courseId);
+
+      const users = await UsersModel.find({ courseId: courseId });
+      console.log("repo getUsersByCourseId users", users);
       return users
     }
     catch (err) {

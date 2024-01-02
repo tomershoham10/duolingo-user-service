@@ -2,7 +2,6 @@ import express, { Request, Response, NextFunction } from "express";
 import { UserController } from "./controller.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import { asyncHandler } from "../middleware/asyncHandler.js";
-import getNextLessonId from "../middleware/getNextLessonId.js";
 
 const userRouter = express.Router();
 
@@ -17,11 +16,6 @@ userRouter
 userRouter
   .post("/login", asyncHandler(UserController.login))
   .post("/", asyncHandler(UserController.registerUser)); //fix this function! add getNextLessonId
-
-// userRouter
-//   .route("/updateNextLessonId/:id")
-//   .get(asyncHandler(UserController.getById))
-//   .put(getNextLessonId, asyncHandler(UserController.updateById))
 
 userRouter
   .put("/updateNextLessonId/:userId", asyncHandler(UserController.updateNextLessonId))

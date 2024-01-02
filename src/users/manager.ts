@@ -15,7 +15,8 @@ export default class UserManager {
     userName: string,
     tId: string | null,
     password: string,
-    permission: Permission
+    permission: PermissionsTypes,
+    courseId: string | null
   ) {
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -23,15 +24,19 @@ export default class UserManager {
       let newUser: Partial<UserType>
       tId ?
         newUser = {
-          userName,
+          userName: userName,
           tId: tId,
           password: hashedPassword,
-          permission,
+          permission: permission,
         } : newUser = {
-          userName,
+          userName: userName,
           password: hashedPassword,
-          permission,
+          permission: permission,
         }
+      if (courseId) {
+        const nextLessonId = await getNextLessonId(courseId);
+        newUser = { ...newUser, nextLessonId: nextLessonId, courseId: courseId }
+      }
 
       const createdNewUser = await UserRepository.registerUser(newUser);
       return createdNewUser;
@@ -62,12 +67,21 @@ export default class UserManager {
   }
 
 
-  static async getUserByPermission(permission: Permission): Promise<UserType[] | null> {
+  static async getUsersByPermission(permission: PermissionsTypes): Promise<UserType[] | null> {
     try {
-      const users = await UserRepository.getUserByPermission(permission);
+      const users = await UserRepository.getUsersByPermission(permission);
       return users || null;
     } catch {
       throw new Error("server error (getUserByPermission).");
+    }
+  }
+
+  static async getUsersByCourseId(courseId: string): Promise<UserType[] | null> {
+    try {
+      const users = await UserRepository.getUsersByCourseId(courseId);
+      return users || null;
+    } catch {
+      throw new Error("server error (getUsersByCourseId).");
     }
   }
 
@@ -90,17 +104,17 @@ export default class UserManager {
 
   static async updateNextLessonId(
     userId: string,
-  ): Promise<string | null> {
+  ): Promise<UserType | null> {
     try {
       console.log("manager - updateNextLessonId", userId);
       const user = await UserRepository.findUserById(userId);
       console.log("manager - updateNextLessonId", user);
-      if (user && user.permission !== Permission.ADMIN) {
+      if (user && user.permission !== PermissionsTypes.ADMIN) {
         const nextLessonId = await getNextLessonId(user.permission, user.nextLessonId);
         console.log("manager - updateNextLessonId - nextLessonId", nextLessonId);
         const updatedUser = await UserRepository.updateUser(user._id, { nextLessonId: nextLessonId });
         console.log("manager - updateNextLessonId - updatedUser", updatedUser);
-        return null;
+        return updatedUser;
       }
       return null;
     } catch {
@@ -126,7 +140,7 @@ export default class UserManager {
     }
   }
 
-  static async roleCheck(userName: string): Promise<Permission | undefined> {
+  static async roleCheck(userName: string): Promise<PermissionsTypes | undefined> {
     try {
       const role = await UserRepository.roleCheck(userName);
       return role;

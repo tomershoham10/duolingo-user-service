@@ -12,12 +12,10 @@ export class UserController {
       console.log("UserController create", body);
 
       const userName = body.userName;
-      let tId: string | null = null;
-      if (body.tId) {
-        tId = body.tId;
-      }
       const permission = body.permission;
       const password = body.password;
+      const tId = body.tId ? body.tId : null
+      const courseId = body.permission === PermissionsTypes.STUDENT ? body.courseId ? body.courseId : null : null;
 
       const existingUser = await User.findOne({ userName });
       if (existingUser) {
@@ -27,7 +25,8 @@ export class UserController {
           userName,
           tId,
           password,
-          permission
+          permission,
+          courseId
         );
         return res.json(user);
       }
@@ -96,16 +95,38 @@ export class UserController {
     try {
       console.log("check1");
       // console.log("controller getByPermission req.params", req.params, req.params.permission);
-      const permission: Permission | undefined = req.params.permission as Permission | undefined;
+      const permission: PermissionsTypes | undefined = req.params.permission as PermissionsTypes | undefined;
       if (permission === undefined) {
         console.log("check2");
 
         new NotFoundError("permission is undefined");
       } else {
         console.log("controller getByPermission", permission);
-        const users: UserType[] | null = await UserManager.getUserByPermission(permission);
+        const users: UserType[] | null = await UserManager.getUsersByPermission(permission);
         users ? res.status(200).json(users)
           : new NotFoundError(`getByPermission not found.`)
+
+      }
+    } catch (e) {
+      res
+        .status(500)
+        .json({ error: "server error" });
+    }
+  }
+
+  static async getByCourseId(req: Express.Request, res: Express.Response) {
+    try {
+      console.log("check1");
+      const courseId: string | undefined = req.params.courseId as string | undefined;
+      if (courseId === undefined) {
+        console.log("check2");
+
+        new NotFoundError("courseId is undefined");
+      } else {
+        console.log("controller getByPermission", courseId);
+        const users: UserType[] | null = await UserManager.getUsersByCourseId(courseId);
+        users ? res.status(200).json(users)
+          : new NotFoundError(`getByCourseId not found.`)
 
       }
     } catch (e) {

@@ -1,16 +1,16 @@
-enum Permission {
+enum PermissionsTypes {
     ADMIN = "admin",
-    SEARIDER = "searider", //S.R.
-    SENIOR = "senior", //bachir
     TEACHER = "teacher",
     CREW = "crew",
+    STUDENT = "student"
 }
 
 interface UserType {
     _id: string;
     tId?: string;
     userName: string;
-    permission: Permission;
+    permission: PermissionsTypes;
     password: string;
-    nextLessonId: string;
+    courseId?: string;
+    nextLessonId?: string;
 }
