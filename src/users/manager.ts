@@ -66,16 +66,6 @@ export default class UserManager {
     }
   }
 
-
-  static async getUsersByPermission(permission: PermissionsTypes): Promise<UserType[] | null> {
-    try {
-      const users = await UserRepository.getUsersByPermission(permission);
-      return users || null;
-    } catch {
-      throw new Error("server error (getUserByPermission).");
-    }
-  }
-
   static async getUsersByCourseId(courseId: string): Promise<UserType[] | null> {
     try {
       const users = await UserRepository.getUsersByCourseId(courseId);

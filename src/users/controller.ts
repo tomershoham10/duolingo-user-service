@@ -91,20 +91,19 @@ export class UserController {
     }
   }
 
-  static async getByPermission(req: Express.Request, res: Express.Response) {
+  static async getUsersByCourseId(req: Express.Request, res: Express.Response) {
     try {
       console.log("check1");
-      // console.log("controller getByPermission req.params", req.params, req.params.permission);
-      const permission: PermissionsTypes | undefined = req.params.permission as PermissionsTypes | undefined;
-      if (permission === undefined) {
-        console.log("check2");
+      const courseId: string | undefined = req.params.courseId as string | undefined;
+      if (!!!courseId) {
+        console.log("courseId is undefined", courseId);
 
-        new NotFoundError("permission is undefined");
+        new NotFoundError("courseId is undefined");
       } else {
-        console.log("controller getByPermission", permission);
-        const users: UserType[] | null = await UserManager.getUsersByPermission(permission);
+        console.log("controller getUsersByCourseId", courseId);
+        const users: UserType[] | null = await UserManager.getUsersByCourseId(courseId);
         users ? res.status(200).json(users)
-          : new NotFoundError(`getByPermission not found.`)
+          : new NotFoundError(`getUsersByCourseId not found.`)
 
       }
     } catch (e) {

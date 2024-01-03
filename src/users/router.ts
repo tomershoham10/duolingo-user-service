@@ -8,7 +8,7 @@ const userRouter = express.Router();
 
 // userRouter.get("/:id", authMiddleware, asyncHandler(UserController.getById));
 userRouter
-  .get("/permission/:permission", asyncHandler(UserController.getByPermission))
+  .get("/getUsersByCourseId/:courseId", asyncHandler(UserController.getUsersByCourseId))
   .get("/getNextLessonId/:id", asyncHandler(UserController.getNextLessonById))
   .get("/:id", asyncHandler(UserController.getById))
   .get("/", asyncHandler(UserController.getMany));
