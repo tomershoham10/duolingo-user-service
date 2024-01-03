@@ -19,7 +19,7 @@ export class UserController {
 
       const existingUser = await User.findOne({ userName });
       if (existingUser) {
-        return res.status(409).json({ error: "User already existed!" });
+        return res.status(403).json({ error: "User already existed!" });
       } else {
         const user: UserType | undefined = await UserManager.registerUser(
           userName,
@@ -28,7 +28,7 @@ export class UserController {
           permission,
           courseId
         );
-        return res.json(user);
+        return res.status(201).json(user);
       }
     } catch (err) {
       console.log(err);
