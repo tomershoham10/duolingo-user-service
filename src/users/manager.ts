@@ -2,14 +2,6 @@ import bcrypt from "bcrypt";
 import UserRepository from "./repository.js";
 import getNextLessonId from "../middleware/getNextLessonId.js";
 
-enum Permission {
-  ADMIN = "admin",
-  SEARIDER = "searider", //S.R.
-  SENIOR = "senior", //bachir
-  TEACHER = "teacher",
-  CREW = "crew",
-}
-
 export default class UserManager {
   static async registerUser(
     userName: string,
@@ -39,9 +31,16 @@ export default class UserManager {
       }
 
       const createdNewUser = await UserRepository.registerUser(newUser);
+      console.log("user manager create - createdNewUser", createdNewUser);
+      if (!createdNewUser) {
+        throw new Error('User manager create error.');
+      }
       return createdNewUser;
     }
-    catch (err) { console.log("manager register", err); }
+    catch (error: any) {
+      console.error('Manager Error [registerUser]:', error.message);
+      throw new Error('Error in user creation process');
+    }
   }
 
   static async findUserById(userId: string): Promise<UserType | null> {
@@ -50,8 +49,9 @@ export default class UserManager {
       const user = await UserRepository.findUserById(userId);
       console.log("manager - findUserById - ", user);
       return user || null;
-    } catch {
-      throw new Error("Error finding user by Id.");
+    } catch (error: any) {
+      console.error('Manager Error [findUserById]:', error.message);
+      throw new Error('Error finding user by id');
     }
   }
 
@@ -60,9 +60,10 @@ export default class UserManager {
       const nextLessonId = await UserRepository.getNextLessonById(userId);
       console.log("manager getNextLessonById - ", nextLessonId);
       return nextLessonId || null;
-    } catch (error) {
-      console.error(error);
-      throw new Error(`Error finding user by Id. ${error}`);
+    }
+    catch (error: any) {
+      console.error('Manager Error [getNextLessonById]:', error.message);
+      throw new Error('Error getting next lesson by id');
     }
   }
 
@@ -70,13 +71,19 @@ export default class UserManager {
     try {
       const users = await UserRepository.getUsersByCourseId(courseId);
       return users || null;
-    } catch {
-      throw new Error("server error (getUsersByCourseId).");
+    } catch (error: any) {
+      console.error('Manager Error [getUsersByCourseId]:', error.message);
+      throw new Error('Error in gettting users by course id');
     }
   }
 
   static async findAllUsers(): Promise<UserType[]> {
-    return UserRepository.findAllUsers();
+    try {
+      return UserRepository.findAllUsers();
+    } catch (error: any) {
+      console.error('Manager Error [findAllUsers]:', error.message);
+      throw new Error('Error in getting all users.');
+    }
   }
 
   static async updateUser(
@@ -87,8 +94,9 @@ export default class UserManager {
       const updatedUser = await UserRepository.updateUser(userId, updateFields);
 
       return updatedUser;
-    } catch {
-      throw new Error("User already existed");
+    } catch (error: any) {
+      console.error('Manager Error [updateUser]:', error.message);
+      throw new Error('Error updating user.');
     }
   }
 
@@ -107,14 +115,21 @@ export default class UserManager {
         return updatedUser;
       }
       return null;
-    } catch {
-      throw new Error("User already existed");
+    } catch (error: any) {
+      console.error('Manager Error [updateNextLessonId]:', error.message);
+      throw new Error('Error in updating user next lesson id field');
     }
   }
 
   static async deleteUser(useId: string): Promise<boolean> {
-    const result = await UserRepository.deleteUser(useId);
-    return result;
+    try {
+      const result = await UserRepository.deleteUser(useId);
+      return result;
+    }
+    catch (error: any) {
+      console.error('Manager Error [deleteUser]:', error.message);
+      throw new Error('Error delitting');
+    }
   }
 
   static async login(userName: string, password: string): Promise<UserType | null> {
@@ -124,9 +139,9 @@ export default class UserManager {
         password
       );
       return user;
-    } catch (err) {
-      console.error("Error while signing in:", err);
-      throw new Error(`error in user manager login - ${err}`);
+    } catch (error: any) {
+      console.error('Manager Error [login]:', error.message);
+      throw new Error('Error in log in proccess');
     }
   }
 
@@ -135,8 +150,9 @@ export default class UserManager {
       const role = await UserRepository.roleCheck(userName);
       return role;
     }
-    catch (err) {
-      console.error(err);
+    catch (error: any) {
+      console.error('Manager Error [roleCheck]:', error.message);
+      throw new Error('Error in roleCheck');
     }
   }
 }

@@ -10,8 +10,17 @@ export default class UserRepository {
       const newUser = await UsersModel.create(user);
       return newUser
     }
-    catch (error) {
-      throw new Error(`User repo create: ${error}`);
+    catch (error: any) {
+      if (error.name === 'ValidationError') {
+        console.error('Repository Validation Error:', error.message);
+        throw new Error('Validation error while creating user');
+      } else if (error.code === 11000) {
+        console.error('Repository Duplicate Key Error:', error.message);
+        throw new Error('Duplicate key error while creating user');
+      } else {
+        console.error('Repository Error:', error.message);
+        throw new Error('Error creating user');
+      }
     }
   }
 
@@ -20,7 +29,8 @@ export default class UserRepository {
       const user = await UsersModel.findById(userId);
       return user;
     }
-    catch (error) {
+    catch (error: any) {
+      console.error('Repository Error:', error.message);
       throw new Error(`User repo findUserById: ${error}`);
     }
   }
@@ -34,7 +44,8 @@ export default class UserRepository {
       }
       else return null;
     }
-    catch (error) {
+    catch (error: any) {
+      console.error('Repository Error:', error.message);
       throw new Error(`User repo findUserById: ${error}`);
     }
   }
@@ -44,7 +55,8 @@ export default class UserRepository {
       const user = await UsersModel.findOne({ userName: userName });
       return user;
     }
-    catch (error) {
+    catch (error: any) {
+      console.error('Repository Error:', error.message);
       throw new Error(`User repo findUserByName: ${error}`);
     }
   }
@@ -68,7 +80,8 @@ export default class UserRepository {
       const result = await UsersModel.findByIdAndDelete(useId);
       return !!result;
     }
-    catch (error) {
+    catch (error: any) {
+      console.error('Repository Error:', error.message);
       throw new Error(`User repo updateUser: ${error}`);
     }
   }
@@ -78,7 +91,8 @@ export default class UserRepository {
       const users = await UsersModel.find();
       return users;
     }
-    catch (error) {
+    catch (error: any) {
+      console.error('Repository Error:', error.message);
       throw new Error(`User repo updateUser: ${error}`);
     }
   }
@@ -99,9 +113,10 @@ export default class UserRepository {
       } else {
         return null;
       }
-    } catch (err) {
-      console.error("Error while signing in:", err);
-      return null;
+    }
+    catch (error: any) {
+      console.error('Repository Error:', error.message);
+      throw new Error(`User repo validateUserCredentials: ${error}`);
     }
   }
 
@@ -130,7 +145,9 @@ export default class UserRepository {
       } else {
         return false;
       }
-    } catch (error) {
+    }
+    catch (error: any) {
+      console.error('Repository Error:', error.message);
       throw new Error("Error updating password");
     }
   }
@@ -143,8 +160,9 @@ export default class UserRepository {
       return role
 
     }
-    catch (err) {
-      console.error(err);
+    catch (error: any) {
+      console.error('Repository Error:', error.message);
+      throw new Error("Error roleCheck");
     }
   }
 
@@ -156,8 +174,9 @@ export default class UserRepository {
       console.log("repo getByPermission users", users);
       return users
     }
-    catch (err) {
-      console.error(err);
+    catch (error: any) {
+      console.error('Repository Error:', error.message);
+      throw new Error("Error getUsersByPermission");
     }
   }
 
@@ -169,8 +188,9 @@ export default class UserRepository {
       console.log("repo getUsersByCourseId users", users);
       return users
     }
-    catch (err) {
-      console.error(err);
+    catch (error: any) {
+      console.error('Repository Error:', error.message);
+      throw new Error("Error getUsersByCourseId");
     }
   }
 }

@@ -5,6 +5,13 @@ import User from "./model.js";
 import UserManager from "./manager.js";
 import { NotFoundError } from "../exceptions/notFoundError.js";
 
+enum PermissionsTypes {
+  ADMIN = "admin",
+  TEACHER = "teacher",
+  CREW = "crew",
+  STUDENT = "student"
+}
+
 export class UserController {
   static async registerUser(req: Express.Request, res: Express.Response) {
     try {
@@ -28,11 +35,16 @@ export class UserController {
           permission,
           courseId
         );
-        return res.status(201).json(user);
+        console.log("controller - register user - user", user);
+        if (!!user) {
+          return res.status(201).json(user);
+        } else {
+          throw new Error('User controller create error.');
+        }
       }
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json({ error: "Internal Server Error" });
+    } catch (error: any) {
+      console.error('Controller Error:', error.message);
+      res.status(400).json({ error: error.message });
     }
   }
 
@@ -42,9 +54,9 @@ export class UserController {
       console.log("getMany", users);
 
       res.status(200).json(users);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ err: "Internal Server Error" });
+    } catch (error: any) {
+      console.error('Controller Error:', error.message);
+      res.status(500).json({ error: error.message });
     }
   }
 
@@ -63,11 +75,9 @@ export class UserController {
         res.status(200).json(user);
         next();
       }
-    } catch (e) {
-      console.error(e);
-      res
-        .status(500)
-        .json({ error: `Error getting the user with ID: ${req.params.id}.` });
+    } catch (error: any) {
+      console.error('Controller Error:', error.message);
+      res.status(500).json({ error: error.message });
     }
   }
 
@@ -83,11 +93,9 @@ export class UserController {
           ? res.status(400).json("level not found.")
           : res.status(200).json(nextLevelId);
       }
-    } catch (e) {
-      console.error(e);
-      res
-        .status(500)
-        .json({ error: `Error getting the next level with ID: ${req.params.id}.` });
+    } catch (error: any) {
+      console.error('Controller Error:', error.message);
+      res.status(500).json({ error: error.message });
     }
   }
 
@@ -106,10 +114,9 @@ export class UserController {
           : new NotFoundError(`getUsersByCourseId not found.`)
 
       }
-    } catch (e) {
-      res
-        .status(500)
-        .json({ error: "server error" });
+    } catch (error: any) {
+      console.error('Controller Error:', error.message);
+      res.status(500).json({ error: error.message });
     }
   }
 
@@ -128,10 +135,9 @@ export class UserController {
           : new NotFoundError(`getByCourseId not found.`)
 
       }
-    } catch (e) {
-      res
-        .status(500)
-        .json({ error: "server error" });
+    } catch (error: any) {
+      console.error('Controller Error:', error.message);
+      res.status(500).json({ error: error.message });
     }
   }
 
@@ -143,8 +149,9 @@ export class UserController {
 
       const user = await UserManager.updateUser(id, body);
       res.json(user);
-    } catch (err) {
-      res.status(500).json({ error: "Error while updating the user." });
+    } catch (error: any) {
+      console.error('Controller Error:', error.message);
+      res.status(500).json({ error: error.message });
     }
   }
 
@@ -155,8 +162,9 @@ export class UserController {
 
       const nextLessonId = await UserManager.updateNextLessonId(userId);
       res.json(nextLessonId);
-    } catch (err) {
-      res.status(500).json({ error: "Error while updateNextLessonId." });
+    } catch (error: any) {
+      console.error('Controller Error:', error.message);
+      res.status(500).json({ error: error.message });
     }
   }
 
@@ -165,8 +173,9 @@ export class UserController {
       const id: string = req.params.id;
       const status = await UserManager.deleteUser(id);
       res.json(status);
-    } catch (err) {
-      res.status(500).json({ error: "Error while deleting the user." });
+    } catch (error: any) {
+      console.error('Controller Error:', error.message);
+      res.status(500).json({ error: error.message });
     }
   }
 
