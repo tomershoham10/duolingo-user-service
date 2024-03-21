@@ -8,7 +8,7 @@ export default class UserManager {
     tId: string | null,
     password: string,
     permission: PermissionsTypes,
-    courseId: string | null
+    courseId: string | null,
   ) {
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -128,7 +128,7 @@ export default class UserManager {
     }
     catch (error: any) {
       console.error('Manager Error [deleteUser]:', error.message);
-      throw new Error('Error delitting');
+      throw new Error('Error delitting user');
     }
   }
 

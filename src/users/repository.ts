@@ -27,6 +27,7 @@ export default class UserRepository {
   static async findUserById(userId: string): Promise<UserType | null> {
     try {
       const user = await UsersModel.findById(userId);
+      console.log("users repo - findById", user);
       return user;
     }
     catch (error: any) {

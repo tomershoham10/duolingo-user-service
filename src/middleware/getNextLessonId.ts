@@ -1,7 +1,7 @@
 import axios from "axios";
 
 async function getNextLessonId(courseId: string, pervLessonId?: string) {
-    if (pervLessonId) {
+    if (!!pervLessonId) {
         const nextLessonResponse = await axios.get(
             `http://classes-service:8080/api/levels/getNextLessonId/${pervLessonId}`,
         );

@@ -4,6 +4,7 @@ import axios from "axios";
 import User from "./model.js";
 import UserManager from "./manager.js";
 import { NotFoundError } from "../exceptions/notFoundError.js";
+import getFirstLessonId from "../utils/getFirstLessonId.js";
 
 enum PermissionsTypes {
   ADMIN = "admin",
@@ -33,7 +34,7 @@ export class UserController {
           tId,
           password,
           permission,
-          courseId
+          courseId,
         );
         console.log("controller - register user - user", user);
         if (!!user) {
