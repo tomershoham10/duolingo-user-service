@@ -198,6 +198,7 @@ export class UserController {
             {
               userName: user.userName,
               userId: user._id,
+              courseId: user.courseId,
               nextLessonId: user.nextLessonId,
               role: role
             }
