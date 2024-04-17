@@ -2,6 +2,13 @@ import bcrypt from "bcrypt";
 import UserRepository from "./repository.js";
 import getNextLessonId from "../middleware/getNextLessonId.js";
 
+enum PermissionsTypes {
+  ADMIN = "admin",
+  TEACHER = "teacher",
+  CREW = "crew",
+  STUDENT = "student"
+}
+
 export default class UserManager {
   static async registerUser(
     userName: string,
@@ -107,8 +114,8 @@ export default class UserManager {
       console.log("manager - updateNextLessonId", userId);
       const user = await UserRepository.findUserById(userId);
       console.log("manager - updateNextLessonId", user);
-      if (user && user.permission !== PermissionsTypes.ADMIN) {
-        const nextLessonId = await getNextLessonId(user.permission, user.nextLessonId);
+      if (user && user.permission === PermissionsTypes.STUDENT && user.courseId) {
+        const nextLessonId = await getNextLessonId(user.courseId, user.nextLessonId);
         console.log("manager - updateNextLessonId - nextLessonId", nextLessonId);
         const updatedUser = await UserRepository.updateUser(user._id, { nextLessonId: nextLessonId });
         console.log("manager - updateNextLessonId - updatedUser", updatedUser);
