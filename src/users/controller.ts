@@ -1,4 +1,4 @@
-import Express from "express";
+import { Request, Response, NextFunction } from "express";
 import axios from "axios";
 
 import User from "./model.js";
@@ -14,7 +14,7 @@ enum PermissionsTypes {
 }
 
 export class UserController {
-  static async registerUser(req: Express.Request, res: Express.Response) {
+  static async registerUser(req: Request, res: Response) {
     try {
       const body: UserType = req.body;
       console.log("UserController create", body);
@@ -49,7 +49,7 @@ export class UserController {
     }
   }
 
-  static async getMany(req: Express.Request, res: Express.Response) {
+  static async getMany(req: Request, res: Response) {
     try {
       const users: UserType[] = await UserManager.findAllUsers();
       console.log("getMany", users);
@@ -61,7 +61,7 @@ export class UserController {
     }
   }
 
-  static async getById(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+  static async getById(req: Request, res: Response, next: NextFunction) {
     try {
       const id: string = req.params.id;
       console.log("getbyid controller id", id);
@@ -82,7 +82,7 @@ export class UserController {
     }
   }
 
-  static async getNextLessonById(req: Express.Request, res: Express.Response) {
+  static async getNextLessonById(req: Request, res: Response) {
     try {
       const userId: string = req.params.id;
       console.log("getNextLevelById controller id", userId);
@@ -100,7 +100,7 @@ export class UserController {
     }
   }
 
-  static async getUsersByCourseId(req: Express.Request, res: Express.Response) {
+  static async getUsersByCourseId(req: Request, res: Response) {
     try {
       console.log("check1");
       const courseId: string | undefined = req.params.courseId as string | undefined;
@@ -121,7 +121,7 @@ export class UserController {
     }
   }
 
-  static async getByCourseId(req: Express.Request, res: Express.Response) {
+  static async getByCourseId(req: Request, res: Response) {
     try {
       console.log("check1");
       const courseId: string | undefined = req.params.courseId as string | undefined;
@@ -142,7 +142,7 @@ export class UserController {
     }
   }
 
-  static async updateById(req: Express.Request, res: Express.Response) {
+  static async updateById(req: Request, res: Response) {
     try {
       const id: string = req.params.id;
       const body: Partial<UserType> = req.body;
@@ -156,7 +156,7 @@ export class UserController {
     }
   }
 
-  static async updateNextLessonId(req: Express.Request, res: Express.Response) {
+  static async updateNextLessonId(req: Request, res: Response) {
     try {
       const userId: string = req.params.userId;
       console.log("controller - updateNextLessonId", userId);
@@ -169,7 +169,7 @@ export class UserController {
     }
   }
 
-  static async deleteById(req: Express.Request, res: Express.Response) {
+  static async deleteById(req: Request, res: Response) {
     try {
       const id: string = req.params.id;
       const status = await UserManager.deleteUser(id);
@@ -180,7 +180,7 @@ export class UserController {
     }
   }
 
-  static async login(req: Express.Request, res: Express.Response) {
+  static async login(req: Request, res: Response) {
     try {
       const userName: string = req.body.userName;
       const password: string = req.body.password;

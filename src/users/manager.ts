@@ -1,6 +1,6 @@
-import bcrypt from "bcrypt";
 import UserRepository from "./repository.js";
 import getNextLessonId from "../middleware/getNextLessonId.js";
+import { hash } from "bcrypt";
 
 enum PermissionsTypes {
   ADMIN = "admin",
@@ -18,7 +18,7 @@ export default class UserManager {
     courseId: string | null,
   ) {
     try {
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await hash(password, 10);
 
       let newUser: Partial<UserType>
       tId ?

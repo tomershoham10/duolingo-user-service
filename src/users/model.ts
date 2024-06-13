@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 
 enum PermissionsTypes {
   ADMIN = "admin",
@@ -35,5 +35,5 @@ const userSchema: Schema<UserType> = new Schema({
   }
 });
 
-const UsersModel = mongoose.model<UserType>("User", userSchema);
+const UsersModel = model<UserType>("User", userSchema);
 export default UsersModel;

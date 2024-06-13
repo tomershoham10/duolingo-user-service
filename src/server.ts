@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import bodyParser from "body-parser";
+import { json } from "body-parser";
 import router from "./router.js";
 import config from "./utils/config.js";
 
@@ -26,7 +26,7 @@ const configureMiddlewares = (app: Express) => {
       exposedHeaders: ["Authorization"],
     })
   );
-  app.use(bodyParser.json());
+  app.use(json());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(errorHandler);

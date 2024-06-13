@@ -1,10 +1,9 @@
-import express, { Router } from "express";
-import Express from "express";
+import { Request, Response, Router } from "express";
 import userRouter from "./users/router.js";
 
-const router: Router = express.Router();
+const router = Router();
 
-router.get("/health", (_req: Express.Request, res: Express.Response) => {
+router.get("/health", (_req: Request, res: Response) => {
   console.log("health");
   res.status(200).send("Alive");
 });

@@ -1,9 +1,9 @@
-import express, { Request, Response, NextFunction } from "express";
+import { Router } from "express";
 import { UserController } from "./controller.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import { asyncHandler } from "../middleware/asyncHandler.js";
 
-const userRouter = express.Router();
+const userRouter = Router();
 
 
 // userRouter.get("/:id", authMiddleware, asyncHandler(UserController.getById));

@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import bcrypt from "bcrypt";
+import { compare, hash } from "bcrypt";
 import UsersModel from "./model.js";
 
 dotenv.config();
@@ -108,7 +108,7 @@ export default class UserRepository {
         return null;
       }
 
-      const passwordMatch = await bcrypt.compare(password, user.password);
+      const passwordMatch = await compare(password, user.password);
       if (passwordMatch) {
         return user;
       } else {
@@ -132,7 +132,7 @@ export default class UserRepository {
         oldPassword
       );
       if (checkOldPassword) {
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const hashedPassword = await hash(newPassword, 10);
 
         const result = await UsersModel.findByIdAndUpdate(userId, {
           password: hashedPassword,
