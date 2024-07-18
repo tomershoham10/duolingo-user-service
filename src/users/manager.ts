@@ -1,12 +1,12 @@
-import UserRepository from "./repository.js";
-import getNextLessonId from "../middleware/getNextLessonId.js";
-import { hash } from "bcrypt";
+import UserRepository from './repository.js';
+import getNextLessonId from '../middleware/getNextLessonId.js';
+import { hash } from 'bcrypt';
 
 enum PermissionsTypes {
-  ADMIN = "admin",
-  TEACHER = "teacher",
-  CREW = "crew",
-  STUDENT = "student"
+  ADMIN = 'admin',
+  TEACHER = 'teacher',
+  CREW = 'crew',
+  STUDENT = 'student',
 }
 
 export default class UserManager {
@@ -15,36 +15,40 @@ export default class UserManager {
     tId: string | null,
     password: string,
     permission: PermissionsTypes,
-    courseId: string | null,
+    courseId: string | null
   ) {
     try {
       const hashedPassword = await hash(password, 10);
 
-      let newUser: Partial<UserType>
-      tId ?
-        newUser = {
-          userName: userName,
-          tId: tId,
-          password: hashedPassword,
-          permission: permission,
-        } : newUser = {
-          userName: userName,
-          password: hashedPassword,
-          permission: permission,
-        }
+      let newUser: Partial<UserType>;
+      tId
+        ? (newUser = {
+            userName: userName,
+            tId: tId,
+            password: hashedPassword,
+            permission: permission,
+          })
+        : (newUser = {
+            userName: userName,
+            password: hashedPassword,
+            permission: permission,
+          });
       if (courseId) {
         const nextLessonId = await getNextLessonId(courseId);
-        newUser = { ...newUser, nextLessonId: nextLessonId, courseId: courseId }
+        newUser = {
+          ...newUser,
+          nextLessonId: nextLessonId,
+          courseId: courseId,
+        };
       }
 
       const createdNewUser = await UserRepository.registerUser(newUser);
-      console.log("user manager create - createdNewUser", createdNewUser);
+      console.log('user manager create - createdNewUser', createdNewUser);
       if (!createdNewUser) {
         throw new Error('User manager create error.');
       }
       return createdNewUser;
-    }
-    catch (error: any) {
+    } catch (error: any) {
       console.error('Manager Error [registerUser]:', error.message);
       throw new Error('Error in user creation process');
     }
@@ -52,9 +56,9 @@ export default class UserManager {
 
   static async findUserById(userId: string): Promise<UserType | null> {
     try {
-      console.log("manager - findUserById - userId", userId);
+      console.log('manager - findUserById - userId', userId);
       const user = await UserRepository.findUserById(userId);
-      console.log("manager - findUserById - ", user);
+      console.log('manager - findUserById - ', user);
       return user || null;
     } catch (error: any) {
       console.error('Manager Error [findUserById]:', error.message);
@@ -65,16 +69,17 @@ export default class UserManager {
   static async getNextLessonById(userId: string): Promise<string | null> {
     try {
       const nextLessonId = await UserRepository.getNextLessonById(userId);
-      console.log("manager getNextLessonById - ", nextLessonId);
+      console.log('manager getNextLessonById - ', nextLessonId);
       return nextLessonId || null;
-    }
-    catch (error: any) {
+    } catch (error: any) {
       console.error('Manager Error [getNextLessonById]:', error.message);
       throw new Error('Error getting next lesson by id');
     }
   }
 
-  static async getUsersByCourseId(courseId: string): Promise<UserType[] | null> {
+  static async getUsersByCourseId(
+    courseId: string
+  ): Promise<UserType[] | null> {
     try {
       const users = await UserRepository.getUsersByCourseId(courseId);
       return users || null;
@@ -107,18 +112,28 @@ export default class UserManager {
     }
   }
 
-  static async updateNextLessonId(
-    userId: string,
-  ): Promise<UserType | null> {
+  static async updateNextLessonId(userId: string): Promise<UserType | null> {
     try {
-      console.log("manager - updateNextLessonId", userId);
+      console.log('manager - updateNextLessonId', userId);
       const user = await UserRepository.findUserById(userId);
-      console.log("manager - updateNextLessonId", user);
-      if (user && user.permission === PermissionsTypes.STUDENT && user.courseId) {
-        const nextLessonId = await getNextLessonId(user.courseId, user.nextLessonId);
-        console.log("manager - updateNextLessonId - nextLessonId", nextLessonId);
-        const updatedUser = await UserRepository.updateUser(user._id, { nextLessonId: nextLessonId });
-        console.log("manager - updateNextLessonId - updatedUser", updatedUser);
+      console.log('manager - updateNextLessonId', user);
+      if (
+        user &&
+        user.permission === PermissionsTypes.STUDENT &&
+        user.courseId
+      ) {
+        const nextLessonId = await getNextLessonId(
+          user.courseId,
+          user.nextLessonId
+        );
+        console.log(
+          'manager - updateNextLessonId - nextLessonId',
+          nextLessonId
+        );
+        const updatedUser = await UserRepository.updateUser(user._id, {
+          nextLessonId: nextLessonId,
+        });
+        console.log('manager - updateNextLessonId - updatedUser', updatedUser);
         return updatedUser;
       }
       return null;
@@ -132,14 +147,16 @@ export default class UserManager {
     try {
       const result = await UserRepository.deleteUser(useId);
       return result;
-    }
-    catch (error: any) {
+    } catch (error: any) {
       console.error('Manager Error [deleteUser]:', error.message);
       throw new Error('Error delitting user');
     }
   }
 
-  static async login(userName: string, password: string): Promise<UserType | null> {
+  static async login(
+    userName: string,
+    password: string
+  ): Promise<UserType | null> {
     try {
       const user = await UserRepository.validateUserCredentials(
         userName,
@@ -152,12 +169,13 @@ export default class UserManager {
     }
   }
 
-  static async roleCheck(userName: string): Promise<PermissionsTypes | undefined> {
+  static async roleCheck(
+    userName: string
+  ): Promise<PermissionsTypes | undefined> {
     try {
       const role = await UserRepository.roleCheck(userName);
       return role;
-    }
-    catch (error: any) {
+    } catch (error: any) {
       console.error('Manager Error [roleCheck]:', error.message);
       throw new Error('Error in roleCheck');
     }

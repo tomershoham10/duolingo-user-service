@@ -5,16 +5,24 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "build": "tsc",
     "build:w": "tsc -w",
     "start": "nodemon ./dist/index.js",
-    "dev": "concurrently  \"npm:build:w\" \"npm:start\""
+    "dev": "concurrently  \"npm:build:w\" \"npm:start\"",
+    "lint": "eslint . --fix"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^20.6.0",
+    "@typescript-eslint/eslint-plugin": "^7.16.1",
+    "@typescript-eslint/parser": "^7.16.1",
     "concurrently": "^8.2.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "prettier": "^3.3.3",
     "typescript": "^5.2.2"
   },
   "dependencies": {

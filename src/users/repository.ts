@@ -1,6 +1,6 @@
-import dotenv from "dotenv";
-import { compare, hash } from "bcrypt";
-import UsersModel from "./model.js";
+import dotenv from 'dotenv';
+import { compare, hash } from 'bcrypt';
+import UsersModel from './model.js';
 
 dotenv.config();
 
@@ -8,9 +8,8 @@ export default class UserRepository {
   static async registerUser(user: Partial<UserType>): Promise<UserType> {
     try {
       const newUser = await UsersModel.create(user);
-      return newUser
-    }
-    catch (error: any) {
+      return newUser;
+    } catch (error: any) {
       if (error.name === 'ValidationError') {
         console.error('Repository Validation Error:', error.message);
         throw new Error('Validation error while creating user');
@@ -27,10 +26,9 @@ export default class UserRepository {
   static async findUserById(userId: string): Promise<UserType | null> {
     try {
       const user = await UsersModel.findById(userId);
-      console.log("users repo - findById", user);
+      console.log('users repo - findById', user);
       return user;
-    }
-    catch (error: any) {
+    } catch (error: any) {
       console.error('Repository Error:', error.message);
       throw new Error(`User repo findUserById: ${error}`);
     }
@@ -42,10 +40,8 @@ export default class UserRepository {
       if (user && user.permission === PermissionsTypes.STUDENT) {
         const nextLessonId = user.nextLessonId;
         return nextLessonId ? nextLessonId : null;
-      }
-      else return null;
-    }
-    catch (error: any) {
+      } else return null;
+    } catch (error: any) {
       console.error('Repository Error:', error.message);
       throw new Error(`User repo findUserById: ${error}`);
     }
@@ -55,8 +51,7 @@ export default class UserRepository {
     try {
       const user = await UsersModel.findOne({ userName: userName });
       return user;
-    }
-    catch (error: any) {
+    } catch (error: any) {
       console.error('Repository Error:', error.message);
       throw new Error(`User repo findUserByName: ${error}`);
     }
@@ -67,11 +62,14 @@ export default class UserRepository {
     updateFields: Partial<UserType>
   ): Promise<UserType | null> {
     try {
-      console.log("repo - update user", userId, updateFields);
-      const updatedUser = await UsersModel.findByIdAndUpdate(userId, updateFields, { new: true });
+      console.log('repo - update user', userId, updateFields);
+      const updatedUser = await UsersModel.findByIdAndUpdate(
+        userId,
+        updateFields,
+        { new: true }
+      );
       return updatedUser;
-    }
-    catch (error) {
+    } catch (error) {
       throw new Error(`User repo updateUser: ${error}`);
     }
   }
@@ -80,8 +78,7 @@ export default class UserRepository {
     try {
       const result = await UsersModel.findByIdAndDelete(useId);
       return !!result;
-    }
-    catch (error: any) {
+    } catch (error: any) {
       console.error('Repository Error:', error.message);
       throw new Error(`User repo updateUser: ${error}`);
     }
@@ -91,8 +88,7 @@ export default class UserRepository {
     try {
       const users = await UsersModel.find();
       return users;
-    }
-    catch (error: any) {
+    } catch (error: any) {
       console.error('Repository Error:', error.message);
       throw new Error(`User repo updateUser: ${error}`);
     }
@@ -114,8 +110,7 @@ export default class UserRepository {
       } else {
         return null;
       }
-    }
-    catch (error: any) {
+    } catch (error: any) {
       console.error('Repository Error:', error.message);
       throw new Error(`User repo validateUserCredentials: ${error}`);
     }
@@ -146,52 +141,52 @@ export default class UserRepository {
       } else {
         return false;
       }
-    }
-    catch (error: any) {
+    } catch (error: any) {
       console.error('Repository Error:', error.message);
-      throw new Error("Error updating password");
+      throw new Error('Error updating password');
     }
   }
 
-  static async roleCheck(userName: string): Promise<PermissionsTypes | undefined> {
+  static async roleCheck(
+    userName: string
+  ): Promise<PermissionsTypes | undefined> {
     try {
-
       const user = await UsersModel.findOne({ userName: userName });
       const role = user?.permission as PermissionsTypes;
-      return role
-
-    }
-    catch (error: any) {
+      return role;
+    } catch (error: any) {
       console.error('Repository Error:', error.message);
-      throw new Error("Error roleCheck");
+      throw new Error('Error roleCheck');
     }
   }
 
-  static async getUsersByPermission(permission: PermissionsTypes): Promise<UserType[] | undefined> {
+  static async getUsersByPermission(
+    permission: PermissionsTypes
+  ): Promise<UserType[] | undefined> {
     try {
-      console.log("repo getByPermission permission", permission);
+      console.log('repo getByPermission permission', permission);
 
       const users = await UsersModel.find({ permission: permission });
-      console.log("repo getByPermission users", users);
-      return users
-    }
-    catch (error: any) {
+      console.log('repo getByPermission users', users);
+      return users;
+    } catch (error: any) {
       console.error('Repository Error:', error.message);
-      throw new Error("Error getUsersByPermission");
+      throw new Error('Error getUsersByPermission');
     }
   }
 
-  static async getUsersByCourseId(courseId: string): Promise<UserType[] | undefined> {
+  static async getUsersByCourseId(
+    courseId: string
+  ): Promise<UserType[] | undefined> {
     try {
-      console.log("repo getUsersByCourseId courseId", courseId);
+      console.log('repo getUsersByCourseId courseId', courseId);
 
       const users = await UsersModel.find({ courseId: courseId });
-      console.log("repo getUsersByCourseId users", users);
-      return users
-    }
-    catch (error: any) {
+      console.log('repo getUsersByCourseId users', users);
+      return users;
+    } catch (error: any) {
       console.error('Repository Error:', error.message);
-      throw new Error("Error getUsersByCourseId");
+      throw new Error('Error getUsersByCourseId');
     }
   }
 }
