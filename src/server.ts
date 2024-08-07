@@ -24,6 +24,7 @@ const configureMiddlewares = (app: Express) => {
       origin: [
         'http://localhost:3000',
         'https://005d-89-138-135-64.ngrok-free.app',
+        'http://89.138.135.64',
       ],
       credentials: true,
       exposedHeaders: ['Authorization'],
