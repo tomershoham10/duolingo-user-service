@@ -34,7 +34,7 @@ export class UserController {
       if (existingUser) {
         return res.status(403).json({ error: 'User already existed!' });
       } else {
-        const user: UserType | undefined = await UserManager.registerUser(
+        const user = await UserManager.registerUser(
           userName,
           tId,
           password,
