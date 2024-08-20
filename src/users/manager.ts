@@ -16,25 +16,27 @@ export default class UserManager {
     password: string,
     permission: PermissionsTypes,
     courseId: string | null
-  ) {
+  ): Promise<UserType | null> {
     try {
+      console.log('registerUser manager', courseId);
       const hashedPassword = await hash(password, 10);
 
       let newUser: Partial<UserType>;
       tId
         ? (newUser = {
-            userName: userName,
-            tId: tId,
-            password: hashedPassword,
-            permission: permission,
-          })
+          userName: userName,
+          tId: tId,
+          password: hashedPassword,
+          permission: permission,
+        })
         : (newUser = {
-            userName: userName,
-            password: hashedPassword,
-            permission: permission,
-          });
+          userName: userName,
+          password: hashedPassword,
+          permission: permission,
+        });
       if (courseId) {
         const nextLessonId = await getNextLessonId(courseId);
+        if (nextLessonId === null) return null;
         newUser = {
           ...newUser,
           nextLessonId: nextLessonId,
@@ -130,6 +132,10 @@ export default class UserManager {
           'manager - updateNextLessonId - nextLessonId',
           nextLessonId
         );
+        if (nextLessonId === null) {
+          return null;
+
+        }
         const updatedUser = await UserRepository.updateUser(user._id, {
           nextLessonId: nextLessonId,
         });
